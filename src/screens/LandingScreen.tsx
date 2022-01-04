@@ -19,6 +19,9 @@ const LandingScreen = () => {
 
   useEffect(() => {
     (async () => {
+      // "requestBackgroundPermissionsAsync" used to stay on background after location tracked or location not tracked
+
+      // "requestForegroundPermissionsAsync" used to go to next after location tracked
       let { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== 'granted') {
