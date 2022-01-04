@@ -1,12 +1,22 @@
 import React, { useState, useReducer, useEffect } from 'react';
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
+import { connect } from 'react-redux';
+import { onUpdateLocation, UserState, ApplicationState } from '../redux';
 import { useNavigation } from '../utils';
 
 const screenWidth = Dimensions.get('screen').width;
 
-const LandingScreen = () => {
+interface LandingProps {
+  userReducer: UserState;
+  onUpdateLocation: () => void;
+  // onUpdateLocation: function
+}
+
+const _LandingScreen: React.FC<LandingProps> = (props) => {
   const { addressContainer, addressTitle, addressText } = styles;
+
+  const { userReducer, onUpdateLocation } = props;
   // navigation custom hook
   const { navigate } = useNavigation();
   const [errorMsg, setErrorMsg] = useState('');
@@ -40,10 +50,12 @@ const LandingScreen = () => {
 
         for (let item of addressResponse) {
           setAddress(item);
+          onUpdateLocation(address);
           let currentAddress = `${item.name}, ${item.street},${item.postalCode},${item.country}`;
           setDisplayAddress(currentAddress);
           if (currentAddress.length > 0) {
             setTimeout(() => {
+              // "homeStack" is the route
               navigate('homeStack');
             }, 2000);
           }
@@ -73,7 +85,7 @@ const LandingScreen = () => {
   );
 };
 
-export default LandingScreen;
+// export default LandingScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -117,3 +129,12 @@ const styles = StyleSheet.create({
     // backgroundColor: 'cyan',
   },
 });
+
+const mapToStateProps = (state: ApplicationState) => {
+  userReducer: state.userReducer;
+};
+
+const LandingScreen = connect(mapToStateProps, { onUpdateLocation })(
+  _LandingScreen
+);
+export { LandingScreen };
